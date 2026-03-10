@@ -4,6 +4,7 @@
     margin: 0 auto;
 }
 
+
 /* Alineación forzada para que los números queden bajo los días */
 .flatpickr-calendar.inline {
     width: 620px !important;

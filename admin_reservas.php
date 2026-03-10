@@ -10,6 +10,8 @@ if (!isset($_SERVER['PHP_AUTH_USER']) || $_SERVER['PHP_AUTH_PW'] != $password_ad
     exit;
 }
 
+
+
 include 'db.php';
 
 // 2. LÓGICA: GUARDAR RANGO DE FECHAS

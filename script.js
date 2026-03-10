@@ -2,6 +2,7 @@
 var conteosHuespedes = { adultos: 1, ninos: 0, mascotas: 0 };
 var miCalendario; 
 
+
 document.addEventListener('DOMContentLoaded', function() {
     // 2. INICIALIZAR EL CALENDARIO (Con 2 meses y en español)
     miCalendario = flatpickr("#calendario-inline", {

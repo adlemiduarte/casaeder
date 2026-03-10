@@ -10,6 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql = "INSERT INTO resenas (nombre_huesped, estrellas, comentario, fecha_estancia) 
             VALUES ('$nombre', '$estrellas', '$comentario', '$fecha')";
 
+
     if (mysqli_query($conn, $sql)) {
         // Esto te saca de la página blanca y te regresa al inicio
         header("Location: index.php");

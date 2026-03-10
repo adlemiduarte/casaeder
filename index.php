@@ -167,8 +167,6 @@ $fechas_prohibidas = array_unique($fechas_prohibidas);
 
     </div>
 </section>
-
-        
             
 <section id="disponibilidad" class="py-16 bg-gray-100">
         <div class="max-w-6xl mx-auto px-4">
