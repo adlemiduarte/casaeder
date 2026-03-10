@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* Esto obliga a que el contenedor NO deje que los días se desparramen */
 .flatpickr-custom-wrapper {
     max-width: 620px;
@@ -149,4 +150,156 @@
 
 #calendario-inline .flatpickr-weekday {
     width: auto !important;
+=======
+/* Esto obliga a que el contenedor NO deje que los días se desparramen */
+.flatpickr-custom-wrapper {
+    max-width: 620px;
+    margin: 0 auto;
+}
+
+/* Alineación forzada para que los números queden bajo los días */
+.flatpickr-calendar.inline {
+    width: 620px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+}
+
+/* 1. Ajuste del contenedor de los números */
+.dayContainer {
+    display: grid !important;
+    /* Cambiamos 1fr por 40px para que no se estiren */
+    grid-template-columns: repeat(7, 40px) !important; 
+    width: 280px !important; /* 7 días x 40px = 280px */
+    min-width: 280px !important;
+    margin: 0 auto !important;
+}
+
+/* 2. Ajuste de las letras de los días (Sun, Mon, Tue...) */
+.flatpickr-weekdays {
+    width: 280px !important;
+    display: flex !important;
+    justify-content: space-around !important;
+}
+
+.flatpickr-weekday {
+    width: 40px !important;
+    flex: none !important;
+}
+
+/* 3. El calendario completo (los dos meses) */
+.flatpickr-calendar.inline {
+    width: 600px !important; /* Reducimos un poco el ancho total */
+    display: flex !important;
+    justify-content: center !important;
+    gap: 20px !important; /* Espacio entre los dos meses */
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Reducimos ligeramente el ancho de los meses para que quepan mejor de lado */
+.flatpickr-calendar.inline {
+    transform: scale(0.95); /* Lo achica un 5% para que no sature el espacio */
+    transform-origin: top left;
+    width: 580px !important; 
+    gap: 15px !important;
+}
+
+/* Asegura que el contenedor del calendario no use espacio de más */
+.flatpickr-custom-wrapper {
+    width: 580px !important;
+    overflow: hidden;
+}
+
+/* 4. Los días redonditos */
+.flatpickr-day {
+    width: 40px !important;
+    max-width: 40px !important;
+    height: 40px !important;
+    line-height: 40px !important;
+    margin: 0 !important; /* Quitamos el margen auto para que no bailen */
+}
+
+/* Forzar que los cuadros de fecha no crezcan */
+#fecha-llegada, #fecha-salida {
+    min-height: 24px; /* Evita que el cuadro colapse si está vacío */
+    white-space: nowrap; /* Evita que la fecha se salte de línea */
+}
+
+/* Asegurar que la tarjeta de reserva no se rompa */
+.reserva-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 400px; /* Ajusta esto según el alto de tu tarjeta */
+}
+
+/* Asegura que la tarjeta no se deforme al cambiar el texto */
+#fecha-llegada, #fecha-salida {
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+/* Evita que el botón se pegue a los bordes si la pantalla es chica */
+.reserva-card-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+#listaHuespedes {
+    display: none; /* Por defecto oculta */
+    position: absolute;
+    z-index: 9999 !important; /* El número más alto para que nada la tape */
+    background: white;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    width: 100%;
+}
+
+/* Esta clase es la que el JS activará */
+#listaHuespedes.show {
+    display: block !important;
+}
+
+/* RESET TOTAL DEL CALENDARIO */
+#calendario-inline .flatpickr-innerContainer {
+    display: block !important;
+}
+
+#calendario-inline .flatpickr-rContainer {
+    display: block !important;
+    width: 100% !important;
+}
+
+/* Forzamos 7 columnas exactas para los días */
+#calendario-inline .dayContainer {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    width: 100% !important;
+    min-width: 280px !important;
+    max-width: 320px !important;
+    margin: 0 auto !important;
+}
+
+/* Ajustamos los días para que no se encimen */
+#calendario-inline .flatpickr-day {
+    width: auto !important;
+    max-width: none !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Alineamos los nombres de los días (L M M J V S D) */
+#calendario-inline .flatpickr-weekdays {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    width: 100% !important;
+    max-width: 320px !important;
+    margin: 0 auto !important;
+}
+
+#calendario-inline .flatpickr-weekday {
+    width: auto !important;
+>>>>>>> 7098397bbaf98697ed68adb0bfd11b27d16ab3ce
 }
