@@ -31,6 +31,32 @@
 <?php
 include 'db.php';
 
+$sql_promedios = "SELECT 
+    AVG(estrellas) as total,  
+    AVG(limpieza) as lim, 
+    AVG(veracidad) as ver, 
+    AVG(llegada) as lleg, 
+    AVG(comunicacion) as com, 
+    AVG(ubicacion) as ubi, 
+    AVG(precio) as pre,
+    COUNT(*) as conteo
+    FROM resenas";
+
+$res_prom = mysqli_query($conn, $sql_promedios);
+$p = mysqli_fetch_assoc($res_prom);
+
+// Calculamos cuántas estrellas hay de cada una para las barritas
+$distribucion = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
+if ($p['conteo'] > 0) {
+    for ($i = 1; $i <= 5; $i++) {
+        $check_cant = mysqli_query($conn, "SELECT COUNT(*) as c FROM resenas WHERE estrellas = $i");
+        $cant_data = mysqli_fetch_assoc($check_cant);
+        $distribucion[$i] = ($cant_data['c'] / $p['conteo']) * 100;
+    }
+} 
+// Si no hay reseñas aún, evitamos que salga error de división por cero
+$promedio_final = ($p['conteo'] > 0) ? number_format($p['total'], 2) : "0.00";
+
 $fechas_prohibidas = [];
 
 // Esta consulta une las fechas de las dos tablas: reseñas y bloqueos manuales
@@ -245,6 +271,72 @@ $fechas_prohibidas = array_unique($fechas_prohibidas);
     
 </div> 
 
+<div class="max-w-6xl mx-auto my-12 p-6 bg-white">
+    
+    <div class="flex items-center gap-2 text-3xl font-bold mb-10">
+        <span class="text-black">★ <?php echo $promedio_final; ?></span>
+        <span class="text-gray-400">·</span>
+        <span><?php echo $p['conteo']; ?> evaluaciones</span>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-16 items-start">
+        
+        <div class="w-full lg:w-1/3 border-r border-gray-100 pr-8">
+            <h3 class="text-lg font-bold mb-6">Calificación general</h3>
+            
+            <?php for($i=5; $i>=1; $i--): ?>
+            <div class="flex items-center gap-4 mb-3">
+                <span class="text-sm font-medium w-4"><?php echo $i; ?></span>
+                <div class="flex-1 bg-gray-100 h-2 rounded-full overflow-hidden">
+                    <div class="bg-black h-full rounded-full" 
+                         style="width: <?php echo $distribucion[$i]; ?>%">
+                    </div>
+                </div>
+            </div>
+            <?php endfor; ?>
+        </div>
+
+        <div class="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-y-10 gap-x-8">
+            
+            <div class="flex flex-col gap-1 border-l-2 border-gray-50 pl-4">
+                <span class="text-sm font-semibold text-gray-800">Limpieza</span>
+                <span class="text-xl font-bold"><?php echo number_format($p['lim'], 1); ?></span>
+                <span class="text-2xl mt-1">✨</span>
+            </div>
+
+            <div class="flex flex-col gap-1 border-l-2 border-gray-50 pl-4">
+                <span class="text-sm font-semibold text-gray-800">Veracidad</span>
+                <span class="text-xl font-bold"><?php echo number_format($p['ver'], 1); ?></span>
+                <span class="text-2xl mt-1">✅</span>
+            </div>
+
+            <div class="flex flex-col gap-1 border-l-2 border-gray-50 pl-4">
+                <span class="text-sm font-semibold text-gray-800">Llegada</span>
+                <span class="text-xl font-bold"><?php echo number_format($p['lleg'], 1); ?></span>
+                <span class="text-2xl mt-1">🔑</span>
+            </div>
+
+            <div class="flex flex-col gap-1 border-l-2 border-gray-50 pl-4">
+                <span class="text-sm font-semibold text-gray-800">Comunicación</span>
+                <span class="text-xl font-bold"><?php echo number_format($p['com'], 1); ?></span>
+                <span class="text-2xl mt-1">💬</span>
+            </div>
+
+            <div class="flex flex-col gap-1 border-l-2 border-gray-50 pl-4">
+                <span class="text-sm font-semibold text-gray-800">Ubicación</span>
+                <span class="text-xl font-bold"><?php echo number_format($p['ubi'], 1); ?></span>
+                <span class="text-2xl mt-1">📍</span>
+            </div>
+
+            <div class="flex flex-col gap-1 border-l-2 border-gray-50 pl-4">
+                <span class="text-sm font-semibold text-gray-800">Precio</span>
+                <span class="text-xl font-bold"><?php echo number_format($p['pre'], 1); ?></span>
+                <span class="text-2xl mt-1">💰</span>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 <section class="py-12 bg-white">
     <div class="max-w-2xl mx-auto px-4">
@@ -257,28 +349,102 @@ $fechas_prohibidas = array_unique($fechas_prohibidas);
                     <input type="text" name="nombre_huesped" required class="w-full p-3 rounded-lg border-gray-200 border focus:ring-2 focus:ring-cyan-500 focus:outline-none transition-all">
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Calificación</label>
-                        <select name="estrellas" class="w-full p-3 rounded-lg border-gray-200 border focus:ring-2 focus:ring-cyan-500 outline-none">
-                            <option value="5">⭐⭐⭐⭐⭐ (Excelente)</option>
-                            <option value="4">⭐⭐⭐⭐ (Muy buena)</option>
-                            <option value="3">⭐⭐⭐ (Regular)</option>
-                            <option value="2">⭐⭐ (Mala)</option>
-                            <option value="1">⭐ (Pesimo)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de estancia</label>
-                        <input type="date" name="fecha_estancia" required class="w-full p-3 rounded-lg border-gray-200 border focus:ring-2 focus:ring-cyan-500 outline-none">
-                    </div>
-                </div>
+                <div class="space-y-6">
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Calificación General</label>
+            <select name="estrellas" class="w-full p-3 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-cyan-500 outline-none">
+                <option value="5">⭐⭐⭐⭐⭐ (Excelente)</option>
+                <option value="4">⭐⭐⭐⭐ (Muy bueno)</option>
+                <option value="3">⭐⭐⭐ (Bueno)</option>
+                <option value="2">⭐⭐ (Regular)</option>
+                <option value="1">⭐ (Malo)</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Fecha de estancia</label>
+            <input type="date" name="fecha_estancia" required class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none">
+        </div>
+    </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Tu Comentario</label>
-                    <textarea name="comentario" required rows="3" class="w-full p-3 rounded-lg border-gray-200 border focus:ring-2 focus:ring-cyan-500 outline-none"></textarea>
-                </div>
+    <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+        <h3 class="text-sm font-bold text-gray-700 mb-4 border-b pb-2">Detalles de tu estancia</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+            <div>
+                <label class="block text-[10px] font-black text-gray-400 uppercase mb-1">Limpieza ✨</label>
+                <select name="limpieza" class="w-full p-2 border border-gray-200 rounded-lg text-sm bg-white">
+                    <option value="5">5 - Excelente</option>
+                    <option value="4">4 - Muy bueno</option>
+                    <option value="3">3 - Bueno</option>
+                    <option value="2">2 - Regular</option>
+                    <option value="1">1 - Malo</option>
+                </select>
+            </div>
 
+            <div>
+                <label class="block text-[10px] font-black text-gray-400 uppercase mb-1">Veracidad ✅</label>
+                <select name="veracidad" class="w-full p-2 border border-gray-200 rounded-lg text-sm bg-white">
+                    <option value="5">5 - Excelente</option>
+                    <option value="4">4 - Muy bueno</option>
+                    <option value="3">3 - Bueno</option>
+                    <option value="2">2 - Regular</option>
+                    <option value="1">1 - Malo</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-black text-gray-400 uppercase mb-1">Llegada 🔑</label>
+                <select name="llegada" class="w-full p-2 border border-gray-200 rounded-lg text-sm bg-white">
+                    <option value="5">5 - Excelente</option>
+                    <option value="4">4 - Muy bueno</option>
+                    <option value="3">3 - Bueno</option>
+                    <option value="2">2 - Regular</option>
+                    <option value="1">1 - Malo</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-black text-gray-400 uppercase mb-1">Comunicación 💬</label>
+                <select name="comunicacion" class="w-full p-2 border border-gray-200 rounded-lg text-sm bg-white">
+                    <option value="5">5 - Excelente</option>
+                    <option value="4">4 - Muy bueno</option>
+                    <option value="3">3 - Bueno</option>
+                    <option value="2">2 - Regular</option>
+                    <option value="1">1 - Malo</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-black text-gray-400 uppercase mb-1">Ubicación 📍</label>
+                <select name="ubicacion" class="w-full p-2 border border-gray-200 rounded-lg text-sm bg-white">
+                    <option value="5">5 - Excelente</option>
+                    <option value="4">4 - Muy bueno</option>
+                    <option value="3">3 - Bueno</option>
+                    <option value="2">2 - Regular</option>
+                    <option value="1">1 - Malo</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-black text-gray-400 uppercase mb-1">Calidad-Precio 💰</label>
+                <select name="precio" class="w-full p-2 border border-gray-200 rounded-lg text-sm bg-white">
+                    <option value="5">5 - Excelente</option>
+                    <option value="4">4 - Muy bueno</option>
+                    <option value="3">3 - Bueno</option>
+                    <option value="2">2 - Regular</option>
+                    <option value="1">1 - Malo</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Tu Comentario</label>
+        <textarea name="comentario" rows="3" placeholder="Cuéntanos más detalles..." class="w-full p-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none"></textarea>
+    </div>
+</div>
                 <button type="submit" class="w-full bg-[#0097b2] hover:bg-[#007a8f] text-white font-bold py-4 rounded-lg shadow-lg transform active:scale-95 transition-all uppercase tracking-wider">
                     Publicar Reseña
                 </button>
