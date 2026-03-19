@@ -1,31 +1,102 @@
 // 1. VARIABLES GLOBALES
 var conteosHuespedes = { adultos: 1, ninos: 0, mascotas: 0 };
-var miCalendario; 
-
+ 
+// 1. Variable global
+var miCalendario;
 
 document.addEventListener('DOMContentLoaded', function() {
-    // 2. INICIALIZAR EL CALENDARIO (Con 2 meses y en español)
+    console.log("Página cargada, iniciando calendario...");
+
+    // 2. Inicialización
     miCalendario = flatpickr("#calendario-inline", {
         inline: true,
         mode: "range",
-        showMonths: 2, // <--- Esto arregla la vista de Marzo y Abril
+        showMonths: 2,
         locale: "es",
         minDate: "today",
         dateFormat: "d/m/Y",
         onChange: function(selectedDates) {
+            console.log("Fechas seleccionadas:", selectedDates);
+
             if (selectedDates.length === 2) {
                 const opciones = { day: 'numeric', month: 'short' };
-                // Actualiza los textos de llegada y salida
-                document.getElementById('fecha-llegada').innerText = selectedDates[0].toLocaleDateString('es-ES', opciones);
-                document.getElementById('fecha-salida').innerText = selectedDates[1].toLocaleDateString('es-ES', opciones);
                 
-                // Cambia el color a negro para resaltar
-                document.getElementById('fecha-llegada').classList.add('text-black');
-                document.getElementById('fecha-salida').classList.add('text-black');
+                // Buscamos los elementos por ID
+                const llegada = document.getElementById('fecha-llegada');
+                const salida = document.getElementById('fecha-salida');
+
+                if (llegada && salida) {
+                    llegada.innerText = selectedDates[0].toLocaleDateString('es-ES', opciones);
+                    salida.innerText = selectedDates[1].toLocaleDateString('es-ES', opciones);
+                    llegada.style.color = "black";
+                    salida.style.color = "black";
+                    console.log("¡Textos actualizados en la tarjeta!");
+                } else {
+                    console.error("No encontré los IDs fecha-llegada o fecha-salida");
+                }
             }
         }
     });
+
+    // 3. Ocultar el input que sale arriba (Punto 1)
+    const inputFeo = document.querySelector('.flatpickr-input');
+    if (inputFeo) inputFeo.style.display = 'none';
 });
+
+// 4. Función Borrar (Punto 3)
+window.borrarFechas = function() {
+    console.log("Borrando fechas...");
+    if (miCalendario) {
+        // Si miCalendario es un array, limpiamos el primero
+        if (Array.isArray(miCalendario)) {
+            miCalendario[0].clear();
+        } else {
+            miCalendario.clear();
+        }
+        
+        document.getElementById('fecha-llegada').innerText = "Agrega fecha";
+        document.getElementById('fecha-salida').innerText = "Agrega fecha";
+        document.getElementById('fecha-llegada').style.color = "#9ca3af";
+        document.getElementById('fecha-salida').style.color = "#9ca3af";
+    }
+};
+
+    // CORRECCIÓN PARA EL ERROR DE CONSOLA:
+    // Flatpickr devuelve un array cuando se usa un selector, tomamos el primer elemento
+    miCalendario = Array.isArray(fpInstance) ? fpInstance[0] : fpInstance;
+
+    // PUNTO 1: Borrar el cuadro de texto que sale arriba
+    const inputFeo = document.querySelector('.flatpickr-input');
+    if (inputFeo) inputFeo.style.display = 'none';
+
+
+// PUNTO 3: Función de borrar corregida
+window.borrarFechas = function() {
+    console.log("¡Botón de borrar clickeado!");
+    
+    if (miCalendario && typeof miCalendario.clear === "function") {
+        miCalendario.clear(); // Ahora sí funcionará .clear()
+        
+        const llegada = document.getElementById('fecha-llegada');
+        const salida = document.getElementById('fecha-salida');
+
+        if (llegada && salida) {
+            llegada.innerText = "Agrega fecha";
+            salida.innerText = "Agrega fecha";
+            llegada.style.color = "#9ca3af"; // Gris original
+            salida.style.color = "#9ca3af";
+        }
+    } else {
+        console.error("No se pudo acceder a la función .clear() de miCalendario");
+    }
+};
+
+    setTimeout(() => {
+        const inputFeo = document.querySelector('.flatpickr-input');
+        if (inputFeo) inputFeo.remove(); 
+    }, 100);
+
+
 
 // 3. FUNCIÓN PARA WHATSAPP
 window.enviarWhatsApp = function() {
@@ -51,15 +122,15 @@ window.enviarWhatsApp = function() {
 };
 
 // 4. FUNCIÓN PARA BORRAR FECHAS (Arreglada)
-window.borrarFechas = function() {
-    if (miCalendario) {
-        miCalendario.clear(); // Limpia el calendario
+// window.borrarFechas = function() {
+   /* if (miCalendario) {
+        miCalendario.clear();
         document.getElementById('fecha-llegada').innerText = "Agrega fecha";
         document.getElementById('fecha-salida').innerText = "Agrega fecha";
-        document.getElementById('fecha-llegada').classList.remove('text-black');
-        document.getElementById('fecha-salida').classList.remove('text-black');
+        document.getElementById('fecha-llegada').className = "text-sm text-gray-400";
+        document.getElementById('fecha-salida').className = "text-sm text-gray-400";
     }
-};
+};*/
 
 // 5. FUNCIONES DE HUÉSPEDES
 window.toggleHuespedes = function() {

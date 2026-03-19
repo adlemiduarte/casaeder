@@ -198,15 +198,19 @@ $fechas_prohibidas = array_unique($fechas_prohibidas);
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex flex-col lg:flex-row gap-8 items-start">
                 
-                <div class="flex-1 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-    <h2 class="text-2xl font-bold mb-2">Selecciona tus fechas</h2>
-    <p id="rango-fechas" class="text-gray-500 mb-6 text-sm">Selecciona el día de llegada y salida</p>
-                    
-                    <div class="calendario-contenedor">
-    <input type="text" id="fecha_reserva" readonly>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+    <h2 class="text-xl font-semibold mb-2">Selecciona tus fechas</h2>
+    <p class="text-gray-500 text-sm mb-4">Selecciona el día de llegada y salida</p>
+
+    <div id="calendario-inline" style="min-height: 400px; width: 100%; border: 1px dashed red;">
+        </div>
+
+    <div class="text-right mt-2">
+        <button type="button" onclick="borrarFechas()" class="text-sm font-bold underline cursor-pointer hover:text-black">
+            Borrar fechas
+        </button>
+    </div>
 </div>
-                    <button onclick="borrarFechas()" class="mt-4 text-sm font-bold underline text-gray-800 float-right">Borrar fechas</button>
-                </div>
 
                 <div class="w-full lg:w-[380px] bg-white p-6 rounded-2xl shadow-xl border border-gray-100 sticky top-24">
                     <h3 class="text-xl font-bold text-gray-800 mb-1">Consulta disponibilidad</h3>
@@ -584,18 +588,19 @@ window.onclick = function(event) {
     }
 });
 
-    function borrarFechas() {
+  function borrarFechas() {
     fp.clear();
     document.getElementById('rango-fechas').innerText = "Selecciona el día de llegada y salida";
     document.getElementById('fecha-llegada').innerText = "Agrega fecha";
     document.getElementById('fecha-salida').innerText = "Agrega fecha";
     document.getElementById('fecha-llegada').classList.replace('text-black', 'text-gray-400');
     document.getElementById('fecha-salida').classList.replace('text-black', 'text-gray-400');
-}
+}    
+
 </script>
 
 <style>
-    /* Estilo para que se parezca a tu foto */
+    
     #calendario-inline .flatpickr-calendar {
     margin: 0 auto !important;
     box-shadow: none !important;
@@ -609,40 +614,62 @@ window.onclick = function(event) {
     
 </style>
 
-<script src="script.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
 
-    <script>
-    const fechasOcupadas = <?php echo json_encode(array_values($fechas_prohibidas)); ?>;
+<script>
+    var miCalendario;
 
-    flatpickr("#fecha_reserva", {
-        locale: "es",
-        minDate: "today",
-        mode: "range",
-        disable: fechasOcupadas,
-        dateFormat: "Y-m-d",
-        inline: true,      // Se queda abierto
-        showMonths: 2,     // Muestra Marzo y Abril al mismo tiempo (como en tu foto)
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Iniciando Flatpickr...");
         
-        onChange: function(selectedDates, dateStr, instance) {
-            if (selectedDates.length === 2) {
-                const start = selectedDates[0];
-                const end = selectedDates[1];
-                
-                const hayBloqueo = fechasOcupadas.some(fecha => {
-                    const d = new Date(fecha + "T00:00:00");
-                    return d >= start && d <= end;
-                });
+        miCalendario = flatpickr("#calendario-inline", {
+            inline: true,
+            mode: "range",
+            showMonths: 2,
+            locale: "es",
+            minDate: "today",
+            dateFormat: "d/m/Y",
+            onChange: function(selectedDates) {
+                if (selectedDates.length === 2) {
+                    const opciones = { day: 'numeric', month: 'short' };
+                    const llegada = document.getElementById('fecha-llegada');
+                    const salida = document.getElementById('fecha-salida');
 
-                if (hayBloqueo) {
-                    alert("¡Ups! Algunas fechas en ese rango ya están reservadas.");
-                    instance.clear();
+                    if (llegada && salida) {
+                        llegada.innerText = selectedDates[0].toLocaleDateString('es-ES', opciones);
+                        salida.innerText = selectedDates[1].toLocaleDateString('es-ES', opciones);
+                        llegada.style.color = "black";
+                        salida.style.color = "black";
+                    }
                 }
             }
-        }
+        });
+
+        // TRUCO: Forzar actualización visual medio segundo después
+        setTimeout(() => {
+            if (miCalendario) miCalendario.redraw();
+            // Borrar el input feo que sale arriba de los meses
+            const inputExtra = document.querySelector('.flatpickr-input');
+            if (inputExtra) inputExtra.style.display = 'none';
+        }, 500);
     });
+
+    function borrarFechas() {
+        if (miCalendario) {
+            miCalendario.clear();
+            const l = document.getElementById('fecha-llegada');
+            const s = document.getElementById('fecha-salida');
+            if (l && s) {
+                l.innerText = "Agrega fecha";
+                s.innerText = "Agrega fecha";
+                l.style.color = "#9ca3af";
+                s.style.color = "#9ca3af";
+            }
+        }
+    }
 </script>
+  
 </body>
 </html>
