@@ -76,14 +76,16 @@ if ($res) {
 // Eliminamos duplicados por si acaso
 $fechas_prohibidas = array_unique($fechas_prohibidas);
 ?>
-    <nav class="fixed w-full z-50 bg-white shadow-md py-4 px-6 flex justify-between items-center">
-        <div class="text-2xl font-bold text-[#0097B2]"> Casa Eder <i class="fas fa-sun text-4xl text-[#f2ce54]"></i></div>
-        <div class="hidden md:flex space-x-8 font-semibold">
-            <a href="#inicio" class="hover:text-blue-500">Inicio</a>
-            <a href="#galeria" class="hover:text-blue-500">Galería</a>
-            <a href="#calendario" class="hover:text-blue-500">Disponibilidad</a>
-            <a href="#contacto" class="hover:text-blue-500">Contacto</a>
-        </div>
+   <nav class="fixed w-full z-50 bg-white shadow-md py-4 px-6 flex justify-between items-center">
+   <img src="img/logo2.png" alt="Casa Eder"style="height: 110px; width: auto; object-fit: contain; margin-left: -10px;">
+    
+    <div class="hidden md:flex space-x-8 font-semibold">
+        <a href="#inicio" class="hover:text-blue-600">Inicio</a>
+        <a href="#galeria" class="hover:text-blue-500">Galería</a>
+        <a href="#calendario" class="hover:text-blue-500">Disponibilidad</a>
+        <a href="#contacto" class="hover:text-blue-500">Contacto</a>
+    </div>
+
     <a href="https://wa.me/5216228555566?text=Hola!%20Buenas%20tardes.%20Vi%20el%20anuncio%20de%20Casa%20Eder%20y%20me%20interesa%20consultar%20disponibilidad%20para%20reservar.%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F%20Gracias." 
    target="_blank" 
    class="inline-block bg-green-500 text-white px-6 py-3 rounded-full font-bold hover:bg-green-600 transition shadow-md">
