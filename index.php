@@ -2,9 +2,24 @@
 <html lang="es">
 <head>
     
+<meta charset="UTF-8">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
+
+<style>
+    /* Oculta el cuadro de texto feo que sale arriba del calendario */
+    .flatpickr-input {
+        display: none !important;
+    }
+
+    /* Tu estilo de las fechas tachadas que ya pusimos antes */
+    .flatpickr-day.flatpickr-disabled {
+        text-decoration: line-through !important;
+        color: #d1d5db !important;
+        opacity: 0.6;
+    }
+</style>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <meta charset="UTF-8">
@@ -80,7 +95,7 @@ $fechas_prohibidas = array_unique($fechas_prohibidas);
    <img src="img/logo2.png" alt="Casa Eder"style="height: 110px; width: auto; object-fit: contain; margin-left: -10px;">
     
     <div class="hidden md:flex space-x-8 font-semibold">
-        <a href="#inicio" class="hover:text-blue-600">Inicio</a>
+        <a href="#inicio" class="hover:text-blue-00">Inicio</a>
         <a href="#galeria" class="hover:text-blue-500">Galería</a>
         <a href="#calendario" class="hover:text-blue-500">Disponibilidad</a>
         <a href="#contacto" class="hover:text-blue-500">Contacto</a>
@@ -253,11 +268,7 @@ $fechas_prohibidas = array_unique($fechas_prohibidas);
                                 </div>
                             </div>
                             <div class="flex justify-between items-center py-3">
-                                <div><p class="text-sm font-bold">Mascotas</p><p class="text-xs text-[#0097b2] underline cursor-pointer">¿Traes animal de servicio?</p></div>
                                 <div class="flex items-center gap-3">
-                                    <button type="button" onclick="cambiarCantidad('mascotas', -1)" class="w-8 h-8 rounded-full border border-gray-300">-</button>
-                                    <span id="cnt-mascotas" class="text-sm w-4 text-center">0</span>
-                                    <button type="button" onclick="cambiarCantidad('mascotas', 1)" class="w-8 h-8 rounded-full border border-gray-300">+</button>
                                 </div>
                             </div>
                             <button type="button" onclick="toggleHuespedes()" class="w-full text-right text-sm font-bold mt-2 underline">Cerrar</button>
@@ -516,7 +527,7 @@ $fechas_prohibidas = array_unique($fechas_prohibidas);
         <h2 class="text-2xl font-bold mb-4">Contáctanos</h2>
         <div class="flex justify-center space-x-6 mb-8 text-3xl">
             <a href="https://facebook.com" class="hover:text-blue-500"><i class="fa-brands fa-facebook"></i></a>
-            <a href="https://instagram.com" class="hover:text-pink-500"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://www.instagram.com/casa.eder.sc?igsh=cWd5enIzMHd0ZHZ2" class="hover:text-pink-500"><i class="fa-brands fa-instagram"></i></a>
             <a href="https://wa.me/5216228555566" class="hover:text-green-500"><i class="fa-brands fa-whatsapp"></i></a>
         </div>
         <p>&copy; 2024 CasaEder - Todos los derechos reservados.</p>
@@ -591,14 +602,30 @@ window.onclick = function(event) {
 });
 
   function borrarFechas() {
-    fp.clear();
-    document.getElementById('rango-fechas').innerText = "Selecciona el día de llegada y salida";
-    document.getElementById('fecha-llegada').innerText = "Agrega fecha";
-    document.getElementById('fecha-salida').innerText = "Agrega fecha";
-    document.getElementById('fecha-llegada').classList.replace('text-black', 'text-gray-400');
-    document.getElementById('fecha-salida').classList.replace('text-black', 'text-gray-400');
-}    
+    // 1. Limpiar el calendario (IMPORTANTE: usa el nombre de tu variable)
+    if (typeof miCalendario !== 'undefined') {
+        miCalendario.clear();
+    }
 
+    // 2. Resetear textos
+    const rango = document.getElementById('rango-fechas');
+    const llegada = document.getElementById('fecha-llegada');
+    const salida = document.getElementById('fecha-salida');
+
+    if (rango) rango.innerText = "Selecciona el día de llegada y salida";
+    
+    if (llegada) {
+        llegada.innerText = "Agrega fecha";
+        llegada.classList.remove('text-black');
+        llegada.classList.add('text-gray-400');
+    }
+    
+    if (salida) {
+        salida.innerText = "Agrega fecha";
+        salida.classList.remove('text-black');
+        salida.classList.add('text-gray-400');
+    }
+}
 </script>
 
 <style>
@@ -620,58 +647,84 @@ window.onclick = function(event) {
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
 
+<style>
+    /* Estilo para tachar los días deshabilitados (bloqueados) */
+    .flatpickr-day.flatpickr-disabled, 
+    .flatpickr-day.flatpickr-disabled:hover {
+        color: #d1d5db !important; /* Gris claro */
+        text-decoration: line-through !important; /* LA RAYITA DE TACHADO */
+        cursor: not-allowed !important;
+        background: transparent !important;
+    }
+
+    /* Opcional: Si quieres que se vean un poco más opacos */
+    .flatpickr-day.flatpickr-disabled {
+        opacity: 0.5;
+    }
+</style>
 <script>
-    var miCalendario;
+    // 1. Cargamos las fechas (asegúrate que el PHP de arriba funcione)
+    const fechasABloquear = <?php echo json_encode($fechas_prohibidas ?? []); ?>;
 
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log("Iniciando Flatpickr...");
-        
-        miCalendario = flatpickr("#calendario-inline", {
-            inline: true,
-            mode: "range",
-            showMonths: 2,
-            locale: "es",
-            minDate: "today",
-            dateFormat: "d/m/Y",
-            onChange: function(selectedDates) {
-                if (selectedDates.length === 2) {
-                    const opciones = { day: 'numeric', month: 'short' };
-                    const llegada = document.getElementById('fecha-llegada');
-                    const salida = document.getElementById('fecha-salida');
-
-                    if (llegada && salida) {
-                        llegada.innerText = selectedDates[0].toLocaleDateString('es-ES', opciones);
-                        salida.innerText = selectedDates[1].toLocaleDateString('es-ES', opciones);
-                        llegada.style.color = "black";
-                        salida.style.color = "black";
-                    }
+    // 2. Inicializamos
+    miCalendario = flatpickr("#calendario-inline", {
+        inline: true,
+        mode: "range",
+        showMonths: 2,
+        locale: "es",
+        minDate: "today",
+        disable: fechasABloquear, // <--- Aquí es donde se bloquean
+        onChange: function(selectedDates) {
+            if (selectedDates.length === 2) {
+                // Aquí actualizas tus textos de llegada y salida
+                const opciones = { day: 'numeric', month: 'short' };
+                if(document.getElementById('fecha-llegada')) {
+                    document.getElementById('fecha-llegada').innerText = selectedDates[0].toLocaleDateString('es-ES', opciones);
                 }
-            }
-        });
-
-        // TRUCO: Forzar actualización visual medio segundo después
-        setTimeout(() => {
-            if (miCalendario) miCalendario.redraw();
-            // Borrar el input feo que sale arriba de los meses
-            const inputExtra = document.querySelector('.flatpickr-input');
-            if (inputExtra) inputExtra.style.display = 'none';
-        }, 500);
-    });
-
-    function borrarFechas() {
-        if (miCalendario) {
-            miCalendario.clear();
-            const l = document.getElementById('fecha-llegada');
-            const s = document.getElementById('fecha-salida');
-            if (l && s) {
-                l.innerText = "Agrega fecha";
-                s.innerText = "Agrega fecha";
-                l.style.color = "#9ca3af";
-                s.style.color = "#9ca3af";
+                if(document.getElementById('fecha-salida')) {
+                    document.getElementById('fecha-salida').innerText = selectedDates[1].toLocaleDateString('es-ES', opciones);
+                }
+            
             }
         }
+    });
+
+    function enviarWhatsApp() {
+    // 1. Validar que el calendario tenga las fechas (usando la variable miCalendario que creamos)
+    if (!miCalendario || miCalendario.selectedDates.length < 2) {
+        alert("Por favor, selecciona primero tu fecha de llegada y salida en el calendario.");
+        return;
     }
+
+    // 2. Obtener y formatear las fechas
+    const fechas = miCalendario.selectedDates;
+    const opciones = { day: 'numeric', month: 'long' };
+    const llegada = fechas[0].toLocaleDateString('es-ES', opciones);
+    const salida = fechas[1].toLocaleDateString('es-ES', opciones);
+
+    // 3. Leer los contadores específicos que encontraste
+    const adultos = document.getElementById('cnt-adultos').innerText;
+    const ninos = document.getElementById('cnt-ninos').innerText;
+    const total = parseInt(adultos) + parseInt(ninos);
+
+    // 4. Configurar el número de WhatsApp (Sin espacios ni el signo +)
+    const telefono = "526228555566"; 
+
+    // 5. Armar el mensaje con el desglose que querías
+    const mensaje = `¡Hola Casa Eder! 👋\n\n` +
+                    `Quisiera consultar disponibilidad para las siguientes fechas:\n` +
+                    `📅 *Llegada:* ${llegada}\n` +
+                    `📅 *Salida:* ${salida}\n\n` +
+                    `👥 *Total:* ${total} personas\n` +
+                    `👤 *Adultos:* ${adultos}\n` +
+                    `👦 *Niños:* ${ninos}\n\n` +
+                    `¿Me podrían confirmar si tienen disponibilidad? ¡Gracias!`;
+
+    // 6. Abrir en una pestaña nueva
+    const url = "https://wa.me/" + telefono + "?text=" + encodeURIComponent(mensaje);
+    window.open(url, '_blank');
+}
 </script>
-  
+
 </body>
 </html>

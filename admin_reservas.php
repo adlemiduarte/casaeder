@@ -107,5 +107,63 @@ $resultado = mysqli_query($conn, "SELECT * FROM fechas_bloqueadas WHERE fecha >=
             <a href="index.php" class="text-cyan-600 underline text-sm">Regresar a la Web</a>
         </div>
     </div>
+
+    <section class="mt-12 bg-white p-8 rounded-3xl shadow-lg border border-gray-100">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">Opiniones de Huéspedes</h2>
+            <p class="text-gray-500 text-sm">Administra los comentarios que aparecen en la web</p>
+        </div>
+        <span class="bg-cyan-100 text-cyan-700 px-4 py-1 rounded-full text-xs font-bold uppercase">
+            Moderación
+        </span>
+    </div>
+
+    <div class="overflow-hidden rounded-xl border border-gray-200">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="bg-gray-50 text-gray-400 text-xs uppercase tracking-widest">
+                    <th class="px-6 py-4 font-black">Huésped</th>
+                    <th class="px-6 py-4 font-black">Calificación</th>
+                    <th class="px-6 py-4 font-black">Comentario</th>
+                    <th class="px-6 py-4 font-black text-center">Acción</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                <?php
+                $conexion = $conn;
+                // IMPORTANTE: Asegúrate de que el nombre de la tabla sea 'resenas'
+                $sql = "SELECT id, nombre_huesped, estrellas, comentario FROM resenas ORDER BY id DESC";
+                $result = mysqli_query($conexion, $sql);
+
+                while($resena = mysqli_fetch_assoc($result)): ?>
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4">
+                            <span class="font-bold text-gray-700"><?php echo $resena['nombre_huesped']; ?></span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex text-yellow-400">
+                                <?php for($i=0; $i<$resena['estrellas']; $i++) echo '★'; ?>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <p class="text-gray-600 text-sm italic truncate max-w-xs">
+                                "<?php echo $resena['comentario']; ?>"
+                            </p>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <a href="eliminar_resena.php?id=<?php echo $resena['id']; ?>" 
+                               onclick="return confirm('¿Seguro que quieres borrar este comentario? Esto no se puede deshacer.')"
+                               class="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-lg text-xs font-bold transition-all">
+                                Borrar
+                            </a>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+    </div>
+</section>
+
 </body>
 </html>
